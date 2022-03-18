@@ -69,6 +69,9 @@ type User struct {
 	// Permissions identifies the permissions that a user has on a given
 	// repository. This is only populated when calling Repositories.ListCollaborators.
 	Permissions map[string]bool `json:"permissions,omitempty"`
+
+	// role_name
+	RoleName *string `json:"role_name,omitempty"`
 }
 
 func (u User) String() string {
