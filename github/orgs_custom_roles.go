@@ -12,21 +12,17 @@ type CustomRole struct {
 
 type CustomRoleList struct {
 	TotalCount	*int64			`json:"total_count",omitempty"`
-	CustomRoles	[]*CustomRole	`json:"custom_roles",omitempty"`
+	CustomRoles	[]CustomRole	`json:"custom_roles",omitempty"`
 }
 
-func (s *OrganizationsService) CustomRoles(ctx context.Context, org string) (*CustomRoleList, *Response, error) {
+func (s *OrganizationsService) ListCustomRoles(ctx context.Context, org string) (*CustomRoleList, *Response, error) {
 	u := fmt.Sprintf("orgs/%v/custom_roles", org)
-	if err != nil {
-		return nil, nil, err
-	}
-
 	req, err := s.client.NewRequest("GET", u, nil)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	var customRoleList *CustomRoleList
+	customRoleList := new(CustomRoleList)
 	resp, err := s.client.Do(ctx, req, customRoleList)
 	if err != nil {
 		return nil, resp, err
