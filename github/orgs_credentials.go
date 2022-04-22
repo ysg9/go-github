@@ -30,7 +30,7 @@ type CredentialAuthorizationsOptions struct {
 }
 
 // GitHub API docs: https://docs.github.com/en/rest/orgs/orgs#list-saml-sso-authorizations-for-an-organization
-func (s *OrganizationsService) CredentialAuthorizations(ctx context.Context, org string, opts *CredentialAuthorizationsOptions) ([]*Credential, *Response, error) {
+func (s *OrganizationsService) GetCredentialAuthorizations(ctx context.Context, org string, opts *CredentialAuthorizationsOptions) ([]*Credential, *Response, error) {
 	u := fmt.Sprintf("orgs/%s/credential-authorizations", org)
 	u, err := addOptions(u, opts)
 	if err != nil {
@@ -48,5 +48,15 @@ func (s *OrganizationsService) CredentialAuthorizations(ctx context.Context, org
 		return nil, resp, err
 	}
 	return creds, resp, nil
+}
+
+// GitHub API docs: https://docs.github.com/en/rest/orgs/orgs#remove-a-saml-sso-authorization-for-an-organization
+func (s *OrganizationsService) RemoveCredentialAuthorizations(ctx context.Context, org, credID string) (*Response, error) {
+	u := fmt.Sprintf("orgs/%s/credential-authorizations/%s", org, credID)
+	req, err := s.client.NewRequest("DELETE", u, nil)
+	if err != nil {
+		return nil, err
+	}
+	return s.client.Do(ctx, req, nil)
 }
 
