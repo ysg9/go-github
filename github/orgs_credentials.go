@@ -30,7 +30,7 @@ type CredentialAuthorizationsOptions struct {
 }
 
 // GitHub API docs: https://docs.github.com/en/rest/orgs/orgs#list-saml-sso-authorizations-for-an-organization
-func (s *github.OrganizationsService) CredentialAuthorizations(ctx context.Context, org string, opts *CredentialAuthorizationsOptions) ([]*Credential, *Response, error) {
+func (s *OrganizationsService) CredentialAuthorizations(ctx context.Context, org string, opts *CredentialAuthorizationsOptions) ([]*Credential, *Response, error) {
 	u := fmt.Sprintf("orgs/%s/credential-authorizations", org)
 	u, err := addOptions(u, opts)
 	if err != nil {
