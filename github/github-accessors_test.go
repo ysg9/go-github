@@ -380,6 +380,13 @@ func TestAlert_GetNumber(tt *testing.T) {
 	a.GetNumber()
 }
 
+func TestAlert_GetRepository(tt *testing.T) {
+	a := &Alert{}
+	a.GetRepository()
+	a = nil
+	a.GetRepository()
+}
+
 func TestAlert_GetRule(tt *testing.T) {
 	a := &Alert{}
 	a.GetRule()
@@ -15754,6 +15761,20 @@ func TestPushEventRepository_GetWatchersCount(tt *testing.T) {
 	p.GetWatchersCount()
 }
 
+func TestRateLimits_GetActionsRunnerRegistration(tt *testing.T) {
+	r := &RateLimits{}
+	r.GetActionsRunnerRegistration()
+	r = nil
+	r.GetActionsRunnerRegistration()
+}
+
+func TestRateLimits_GetCodeScanningUpload(tt *testing.T) {
+	r := &RateLimits{}
+	r.GetCodeScanningUpload()
+	r = nil
+	r.GetCodeScanningUpload()
+}
+
 func TestRateLimits_GetCore(tt *testing.T) {
 	r := &RateLimits{}
 	r.GetCore()
@@ -15761,11 +15782,39 @@ func TestRateLimits_GetCore(tt *testing.T) {
 	r.GetCore()
 }
 
+func TestRateLimits_GetGraphQL(tt *testing.T) {
+	r := &RateLimits{}
+	r.GetGraphQL()
+	r = nil
+	r.GetGraphQL()
+}
+
+func TestRateLimits_GetIntegrationManifest(tt *testing.T) {
+	r := &RateLimits{}
+	r.GetIntegrationManifest()
+	r = nil
+	r.GetIntegrationManifest()
+}
+
+func TestRateLimits_GetSCIM(tt *testing.T) {
+	r := &RateLimits{}
+	r.GetSCIM()
+	r = nil
+	r.GetSCIM()
+}
+
 func TestRateLimits_GetSearch(tt *testing.T) {
 	r := &RateLimits{}
 	r.GetSearch()
 	r = nil
 	r.GetSearch()
+}
+
+func TestRateLimits_GetSourceImport(tt *testing.T) {
+	r := &RateLimits{}
+	r.GetSourceImport()
+	r = nil
+	r.GetSourceImport()
 }
 
 func TestReaction_GetContent(tt *testing.T) {
@@ -16185,6 +16234,46 @@ func TestRenameOrgResponse_GetURL(tt *testing.T) {
 	r.GetURL()
 	r = nil
 	r.GetURL()
+}
+
+func TestRepoMergeUpstreamRequest_GetBranch(tt *testing.T) {
+	var zeroValue string
+	r := &RepoMergeUpstreamRequest{Branch: &zeroValue}
+	r.GetBranch()
+	r = &RepoMergeUpstreamRequest{}
+	r.GetBranch()
+	r = nil
+	r.GetBranch()
+}
+
+func TestRepoMergeUpstreamResult_GetBaseBranch(tt *testing.T) {
+	var zeroValue string
+	r := &RepoMergeUpstreamResult{BaseBranch: &zeroValue}
+	r.GetBaseBranch()
+	r = &RepoMergeUpstreamResult{}
+	r.GetBaseBranch()
+	r = nil
+	r.GetBaseBranch()
+}
+
+func TestRepoMergeUpstreamResult_GetMergeType(tt *testing.T) {
+	var zeroValue string
+	r := &RepoMergeUpstreamResult{MergeType: &zeroValue}
+	r.GetMergeType()
+	r = &RepoMergeUpstreamResult{}
+	r.GetMergeType()
+	r = nil
+	r.GetMergeType()
+}
+
+func TestRepoMergeUpstreamResult_GetMessage(tt *testing.T) {
+	var zeroValue string
+	r := &RepoMergeUpstreamResult{Message: &zeroValue}
+	r.GetMessage()
+	r = &RepoMergeUpstreamResult{}
+	r.GetMessage()
+	r = nil
+	r.GetMessage()
 }
 
 func TestRepoName_GetFrom(tt *testing.T) {
@@ -17609,6 +17698,37 @@ func TestRepositoryEvent_GetSender(tt *testing.T) {
 	r.GetSender()
 }
 
+func TestRepositoryImportEvent_GetOrg(tt *testing.T) {
+	r := &RepositoryImportEvent{}
+	r.GetOrg()
+	r = nil
+	r.GetOrg()
+}
+
+func TestRepositoryImportEvent_GetRepo(tt *testing.T) {
+	r := &RepositoryImportEvent{}
+	r.GetRepo()
+	r = nil
+	r.GetRepo()
+}
+
+func TestRepositoryImportEvent_GetSender(tt *testing.T) {
+	r := &RepositoryImportEvent{}
+	r.GetSender()
+	r = nil
+	r.GetSender()
+}
+
+func TestRepositoryImportEvent_GetStatus(tt *testing.T) {
+	var zeroValue string
+	r := &RepositoryImportEvent{Status: &zeroValue}
+	r.GetStatus()
+	r = &RepositoryImportEvent{}
+	r.GetStatus()
+	r = nil
+	r.GetStatus()
+}
+
 func TestRepositoryInvitation_GetCreatedAt(tt *testing.T) {
 	var zeroValue Timestamp
 	r := &RepositoryInvitation{CreatedAt: &zeroValue}
@@ -18214,6 +18334,13 @@ func TestRepositoryVulnerabilityAlertEvent_GetRepository(tt *testing.T) {
 	r.GetRepository()
 	r = nil
 	r.GetRepository()
+}
+
+func TestRepositoryVulnerabilityAlertEvent_GetSender(tt *testing.T) {
+	r := &RepositoryVulnerabilityAlertEvent{}
+	r.GetSender()
+	r = nil
+	r.GetSender()
 }
 
 func TestRepoStats_GetForkRepos(tt *testing.T) {

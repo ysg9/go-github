@@ -342,6 +342,14 @@ func (a *Alert) GetNumber() int {
 	return *a.Number
 }
 
+// GetRepository returns the Repository field.
+func (a *Alert) GetRepository() *Repository {
+	if a == nil {
+		return nil
+	}
+	return a.Repository
+}
+
 // GetRule returns the Rule field.
 func (a *Alert) GetRule() *Rule {
 	if a == nil {
@@ -13534,6 +13542,22 @@ func (p *PushEventRepository) GetWatchersCount() int {
 	return *p.WatchersCount
 }
 
+// GetActionsRunnerRegistration returns the ActionsRunnerRegistration field.
+func (r *RateLimits) GetActionsRunnerRegistration() *Rate {
+	if r == nil {
+		return nil
+	}
+	return r.ActionsRunnerRegistration
+}
+
+// GetCodeScanningUpload returns the CodeScanningUpload field.
+func (r *RateLimits) GetCodeScanningUpload() *Rate {
+	if r == nil {
+		return nil
+	}
+	return r.CodeScanningUpload
+}
+
 // GetCore returns the Core field.
 func (r *RateLimits) GetCore() *Rate {
 	if r == nil {
@@ -13542,12 +13566,44 @@ func (r *RateLimits) GetCore() *Rate {
 	return r.Core
 }
 
+// GetGraphQL returns the GraphQL field.
+func (r *RateLimits) GetGraphQL() *Rate {
+	if r == nil {
+		return nil
+	}
+	return r.GraphQL
+}
+
+// GetIntegrationManifest returns the IntegrationManifest field.
+func (r *RateLimits) GetIntegrationManifest() *Rate {
+	if r == nil {
+		return nil
+	}
+	return r.IntegrationManifest
+}
+
+// GetSCIM returns the SCIM field.
+func (r *RateLimits) GetSCIM() *Rate {
+	if r == nil {
+		return nil
+	}
+	return r.SCIM
+}
+
 // GetSearch returns the Search field.
 func (r *RateLimits) GetSearch() *Rate {
 	if r == nil {
 		return nil
 	}
 	return r.Search
+}
+
+// GetSourceImport returns the SourceImport field.
+func (r *RateLimits) GetSourceImport() *Rate {
+	if r == nil {
+		return nil
+	}
+	return r.SourceImport
 }
 
 // GetContent returns the Content field if it's non-nil, zero value otherwise.
@@ -13900,6 +13956,38 @@ func (r *RenameOrgResponse) GetURL() string {
 		return ""
 	}
 	return *r.URL
+}
+
+// GetBranch returns the Branch field if it's non-nil, zero value otherwise.
+func (r *RepoMergeUpstreamRequest) GetBranch() string {
+	if r == nil || r.Branch == nil {
+		return ""
+	}
+	return *r.Branch
+}
+
+// GetBaseBranch returns the BaseBranch field if it's non-nil, zero value otherwise.
+func (r *RepoMergeUpstreamResult) GetBaseBranch() string {
+	if r == nil || r.BaseBranch == nil {
+		return ""
+	}
+	return *r.BaseBranch
+}
+
+// GetMergeType returns the MergeType field if it's non-nil, zero value otherwise.
+func (r *RepoMergeUpstreamResult) GetMergeType() string {
+	if r == nil || r.MergeType == nil {
+		return ""
+	}
+	return *r.MergeType
+}
+
+// GetMessage returns the Message field if it's non-nil, zero value otherwise.
+func (r *RepoMergeUpstreamResult) GetMessage() string {
+	if r == nil || r.Message == nil {
+		return ""
+	}
+	return *r.Message
 }
 
 // GetFrom returns the From field if it's non-nil, zero value otherwise.
@@ -15102,6 +15190,38 @@ func (r *RepositoryEvent) GetSender() *User {
 	return r.Sender
 }
 
+// GetOrg returns the Org field.
+func (r *RepositoryImportEvent) GetOrg() *Organization {
+	if r == nil {
+		return nil
+	}
+	return r.Org
+}
+
+// GetRepo returns the Repo field.
+func (r *RepositoryImportEvent) GetRepo() *Repository {
+	if r == nil {
+		return nil
+	}
+	return r.Repo
+}
+
+// GetSender returns the Sender field.
+func (r *RepositoryImportEvent) GetSender() *User {
+	if r == nil {
+		return nil
+	}
+	return r.Sender
+}
+
+// GetStatus returns the Status field if it's non-nil, zero value otherwise.
+func (r *RepositoryImportEvent) GetStatus() string {
+	if r == nil || r.Status == nil {
+		return ""
+	}
+	return *r.Status
+}
+
 // GetCreatedAt returns the CreatedAt field if it's non-nil, zero value otherwise.
 func (r *RepositoryInvitation) GetCreatedAt() Timestamp {
 	if r == nil || r.CreatedAt == nil {
@@ -15612,6 +15732,14 @@ func (r *RepositoryVulnerabilityAlertEvent) GetRepository() *Repository {
 		return nil
 	}
 	return r.Repository
+}
+
+// GetSender returns the Sender field.
+func (r *RepositoryVulnerabilityAlertEvent) GetSender() *User {
+	if r == nil {
+		return nil
+	}
+	return r.Sender
 }
 
 // GetForkRepos returns the ForkRepos field if it's non-nil, zero value otherwise.
