@@ -62,7 +62,6 @@ type Repository struct {
 	TemplateRepository  *Repository     `json:"template_repository,omitempty"`
 	Organization        *Organization   `json:"organization,omitempty"`
 	Permissions         map[string]bool `json:"permissions,omitempty"`
-	RoleName            *string         `json:"role_name,omitempty"`
 	AllowRebaseMerge    *bool           `json:"allow_rebase_merge,omitempty"`
 	AllowUpdateBranch   *bool           `json:"allow_update_branch,omitempty"`
 	AllowSquashMerge    *bool           `json:"allow_squash_merge,omitempty"`
