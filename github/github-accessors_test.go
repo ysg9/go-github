@@ -4022,6 +4022,13 @@ func TestCreateEvent_GetMasterBranch(tt *testing.T) {
 	c.GetMasterBranch()
 }
 
+func TestCreateEvent_GetOrg(tt *testing.T) {
+	c := &CreateEvent{}
+	c.GetOrg()
+	c = nil
+	c.GetOrg()
+}
+
 func TestCreateEvent_GetPusherType(tt *testing.T) {
 	var zeroValue string
 	c := &CreateEvent{PusherType: &zeroValue}
@@ -9245,6 +9252,13 @@ func TestLabelEvent_GetRepo(tt *testing.T) {
 	l.GetRepo()
 }
 
+func TestLabelEvent_GetSender(tt *testing.T) {
+	l := &LabelEvent{}
+	l.GetSender()
+	l = nil
+	l.GetSender()
+}
+
 func TestLabelResult_GetColor(tt *testing.T) {
 	var zeroValue string
 	l := &LabelResult{Color: &zeroValue}
@@ -10227,6 +10241,27 @@ func TestMetaEvent_GetInstallation(tt *testing.T) {
 	m.GetInstallation()
 	m = nil
 	m.GetInstallation()
+}
+
+func TestMetaEvent_GetOrg(tt *testing.T) {
+	m := &MetaEvent{}
+	m.GetOrg()
+	m = nil
+	m.GetOrg()
+}
+
+func TestMetaEvent_GetRepo(tt *testing.T) {
+	m := &MetaEvent{}
+	m.GetRepo()
+	m = nil
+	m.GetRepo()
+}
+
+func TestMetaEvent_GetSender(tt *testing.T) {
+	m := &MetaEvent{}
+	m.GetSender()
+	m = nil
+	m.GetSender()
 }
 
 func TestMetric_GetHTMLURL(tt *testing.T) {
@@ -11244,6 +11279,16 @@ func TestOrganization_GetMembersCanCreateRepos(tt *testing.T) {
 	o.GetMembersCanCreateRepos()
 	o = nil
 	o.GetMembersCanCreateRepos()
+}
+
+func TestOrganization_GetMembersCanForkPrivateRepos(tt *testing.T) {
+	var zeroValue bool
+	o := &Organization{MembersCanForkPrivateRepos: &zeroValue}
+	o.GetMembersCanForkPrivateRepos()
+	o = &Organization{}
+	o.GetMembersCanForkPrivateRepos()
+	o = nil
+	o.GetMembersCanForkPrivateRepos()
 }
 
 func TestOrganization_GetMembersURL(tt *testing.T) {
@@ -12619,6 +12664,27 @@ func TestPingEvent_GetInstallation(tt *testing.T) {
 	p.GetInstallation()
 	p = nil
 	p.GetInstallation()
+}
+
+func TestPingEvent_GetOrg(tt *testing.T) {
+	p := &PingEvent{}
+	p.GetOrg()
+	p = nil
+	p.GetOrg()
+}
+
+func TestPingEvent_GetRepo(tt *testing.T) {
+	p := &PingEvent{}
+	p.GetRepo()
+	p = nil
+	p.GetRepo()
+}
+
+func TestPingEvent_GetSender(tt *testing.T) {
+	p := &PingEvent{}
+	p.GetSender()
+	p = nil
+	p.GetSender()
 }
 
 func TestPingEvent_GetZen(tt *testing.T) {
@@ -17210,6 +17276,16 @@ func TestRepository_GetURL(tt *testing.T) {
 	r.GetURL()
 	r = nil
 	r.GetURL()
+}
+
+func TestRepository_GetUseSquashPRTitleAsDefault(tt *testing.T) {
+	var zeroValue bool
+	r := &Repository{UseSquashPRTitleAsDefault: &zeroValue}
+	r.GetUseSquashPRTitleAsDefault()
+	r = &Repository{}
+	r.GetUseSquashPRTitleAsDefault()
+	r = nil
+	r.GetUseSquashPRTitleAsDefault()
 }
 
 func TestRepository_GetVisibility(tt *testing.T) {
@@ -21858,6 +21934,16 @@ func TestUser_GetReposURL(tt *testing.T) {
 	u.GetReposURL()
 }
 
+func TestUser_GetRoleName(tt *testing.T) {
+	var zeroValue string
+	u := &User{RoleName: &zeroValue}
+	u.GetRoleName()
+	u = &User{}
+	u.GetRoleName()
+	u = nil
+	u.GetRoleName()
+}
+
 func TestUser_GetSiteAdmin(tt *testing.T) {
 	var zeroValue bool
 	u := &User{SiteAdmin: &zeroValue}
@@ -22976,6 +23062,13 @@ func TestWorkflowJobEvent_GetWorkflowJob(tt *testing.T) {
 	w.GetWorkflowJob()
 	w = nil
 	w.GetWorkflowJob()
+}
+
+func TestWorkflowRun_GetActor(tt *testing.T) {
+	w := &WorkflowRun{}
+	w.GetActor()
+	w = nil
+	w.GetActor()
 }
 
 func TestWorkflowRun_GetArtifactsURL(tt *testing.T) {
