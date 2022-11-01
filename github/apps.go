@@ -59,8 +59,9 @@ type InstallationTokenOptions struct {
 // InstallationPermissions lists the repository and organization permissions for an installation.
 //
 // Permission names taken from:
-//   https://docs.github.com/en/enterprise-server@3.0/rest/apps#create-an-installation-access-token-for-an-app
-//   https://docs.github.com/en/rest/apps#create-an-installation-access-token-for-an-app
+//
+//	https://docs.github.com/en/enterprise-server@3.0/rest/apps#create-an-installation-access-token-for-an-app
+//	https://docs.github.com/en/rest/apps#create-an-installation-access-token-for-an-app
 type InstallationPermissions struct {
 	Actions                       *string `json:"actions,omitempty"`
 	Administration                *string `json:"administration,omitempty"`
@@ -76,7 +77,9 @@ type InstallationPermissions struct {
 	Metadata                      *string `json:"metadata,omitempty"`
 	Members                       *string `json:"members,omitempty"`
 	OrganizationAdministration    *string `json:"organization_administration,omitempty"`
+	OrganizationCustomRoles       *string `json:"organization_custom_roles,omitempty"`
 	OrganizationHooks             *string `json:"organization_hooks,omitempty"`
+	OrganizationPackages          *string `json:"organization_packages,omitempty"`
 	OrganizationPlan              *string `json:"organization_plan,omitempty"`
 	OrganizationPreReceiveHooks   *string `json:"organization_pre_receive_hooks,omitempty"`
 	OrganizationProjects          *string `json:"organization_projects,omitempty"`

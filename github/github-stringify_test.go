@@ -997,15 +997,22 @@ func TestOrganization_String(t *testing.T) {
 		MembersCanCreatePages:                Bool(false),
 		MembersCanCreatePublicPages:          Bool(false),
 		MembersCanCreatePrivatePages:         Bool(false),
-		URL:                                  String(""),
-		EventsURL:                            String(""),
-		HooksURL:                             String(""),
-		IssuesURL:                            String(""),
-		MembersURL:                           String(""),
-		PublicMembersURL:                     String(""),
-		ReposURL:                             String(""),
+		WebCommitSignoffRequired:             Bool(false),
+		AdvancedSecurityEnabledForNewRepos:   Bool(false),
+		DependabotAlertsEnabledForNewRepos:   Bool(false),
+		DependabotSecurityUpdatesEnabledForNewRepos:    Bool(false),
+		DependencyGraphEnabledForNewRepos:              Bool(false),
+		SecretScanningEnabledForNewRepos:               Bool(false),
+		SecretScanningPushProtectionEnabledForNewRepos: Bool(false),
+		URL:              String(""),
+		EventsURL:        String(""),
+		HooksURL:         String(""),
+		IssuesURL:        String(""),
+		MembersURL:       String(""),
+		PublicMembersURL: String(""),
+		ReposURL:         String(""),
 	}
-	want := `github.Organization{Login:"", ID:0, NodeID:"", AvatarURL:"", HTMLURL:"", Name:"", Company:"", Blog:"", Location:"", Email:"", TwitterUsername:"", Description:"", PublicRepos:0, PublicGists:0, Followers:0, Following:0, TotalPrivateRepos:0, OwnedPrivateRepos:0, PrivateGists:0, DiskUsage:0, Collaborators:0, BillingEmail:"", Type:"", Plan:github.Plan{}, TwoFactorRequirementEnabled:false, IsVerified:false, HasOrganizationProjects:false, HasRepositoryProjects:false, DefaultRepoPermission:"", DefaultRepoSettings:"", MembersCanCreateRepos:false, MembersCanCreatePublicRepos:false, MembersCanCreatePrivateRepos:false, MembersCanCreateInternalRepos:false, MembersCanForkPrivateRepos:false, MembersAllowedRepositoryCreationType:"", MembersCanCreatePages:false, MembersCanCreatePublicPages:false, MembersCanCreatePrivatePages:false, URL:"", EventsURL:"", HooksURL:"", IssuesURL:"", MembersURL:"", PublicMembersURL:"", ReposURL:""}`
+	want := `github.Organization{Login:"", ID:0, NodeID:"", AvatarURL:"", HTMLURL:"", Name:"", Company:"", Blog:"", Location:"", Email:"", TwitterUsername:"", Description:"", PublicRepos:0, PublicGists:0, Followers:0, Following:0, TotalPrivateRepos:0, OwnedPrivateRepos:0, PrivateGists:0, DiskUsage:0, Collaborators:0, BillingEmail:"", Type:"", Plan:github.Plan{}, TwoFactorRequirementEnabled:false, IsVerified:false, HasOrganizationProjects:false, HasRepositoryProjects:false, DefaultRepoPermission:"", DefaultRepoSettings:"", MembersCanCreateRepos:false, MembersCanCreatePublicRepos:false, MembersCanCreatePrivateRepos:false, MembersCanCreateInternalRepos:false, MembersCanForkPrivateRepos:false, MembersAllowedRepositoryCreationType:"", MembersCanCreatePages:false, MembersCanCreatePublicPages:false, MembersCanCreatePrivatePages:false, WebCommitSignoffRequired:false, AdvancedSecurityEnabledForNewRepos:false, DependabotAlertsEnabledForNewRepos:false, DependabotSecurityUpdatesEnabledForNewRepos:false, DependencyGraphEnabledForNewRepos:false, SecretScanningEnabledForNewRepos:false, SecretScanningPushProtectionEnabledForNewRepos:false, URL:"", EventsURL:"", HooksURL:"", IssuesURL:"", MembersURL:"", PublicMembersURL:"", ReposURL:""}`
 	if got := v.String(); got != want {
 		t.Errorf("Organization.String = %v, want %v", got, want)
 	}
@@ -1524,6 +1531,10 @@ func TestRepository_String(t *testing.T) {
 		AllowForking:              Bool(false),
 		DeleteBranchOnMerge:       Bool(false),
 		UseSquashPRTitleAsDefault: Bool(false),
+		SquashMergeCommitTitle:    String(""),
+		SquashMergeCommitMessage:  String(""),
+		MergeCommitTitle:          String(""),
+		MergeCommitMessage:        String(""),
 		Topics:                    []string{""},
 		Archived:                  Bool(false),
 		Disabled:                  Bool(false),
@@ -1579,7 +1590,7 @@ func TestRepository_String(t *testing.T) {
 		Visibility:                String(""),
 		RoleName:                  String(""),
 	}
-	want := `github.Repository{ID:0, NodeID:"", Owner:github.User{}, Name:"", FullName:"", Description:"", Homepage:"", CodeOfConduct:github.CodeOfConduct{}, DefaultBranch:"", MasterBranch:"", CreatedAt:github.Timestamp{0001-01-01 00:00:00 +0000 UTC}, PushedAt:github.Timestamp{0001-01-01 00:00:00 +0000 UTC}, UpdatedAt:github.Timestamp{0001-01-01 00:00:00 +0000 UTC}, HTMLURL:"", CloneURL:"", GitURL:"", MirrorURL:"", SSHURL:"", SVNURL:"", Language:"", Fork:false, ForksCount:0, NetworkCount:0, OpenIssuesCount:0, OpenIssues:0, StargazersCount:0, SubscribersCount:0, WatchersCount:0, Watchers:0, Size:0, AutoInit:false, Parent:github.Repository{}, Source:github.Repository{}, TemplateRepository:github.Repository{}, Organization:github.Organization{}, AllowRebaseMerge:false, AllowUpdateBranch:false, AllowSquashMerge:false, AllowMergeCommit:false, AllowAutoMerge:false, AllowForking:false, DeleteBranchOnMerge:false, UseSquashPRTitleAsDefault:false, Topics:[""], Archived:false, Disabled:false, License:github.License{}, Private:false, HasIssues:false, HasWiki:false, HasPages:false, HasProjects:false, HasDownloads:false, IsTemplate:false, LicenseTemplate:"", GitignoreTemplate:"", SecurityAndAnalysis:github.SecurityAndAnalysis{}, TeamID:0, URL:"", ArchiveURL:"", AssigneesURL:"", BlobsURL:"", BranchesURL:"", CollaboratorsURL:"", CommentsURL:"", CommitsURL:"", CompareURL:"", ContentsURL:"", ContributorsURL:"", DeploymentsURL:"", DownloadsURL:"", EventsURL:"", ForksURL:"", GitCommitsURL:"", GitRefsURL:"", GitTagsURL:"", HooksURL:"", IssueCommentURL:"", IssueEventsURL:"", IssuesURL:"", KeysURL:"", LabelsURL:"", LanguagesURL:"", MergesURL:"", MilestonesURL:"", NotificationsURL:"", PullsURL:"", ReleasesURL:"", StargazersURL:"", StatusesURL:"", SubscribersURL:"", SubscriptionURL:"", TagsURL:"", TreesURL:"", TeamsURL:"", Visibility:"", RoleName:""}`
+	want := `github.Repository{ID:0, NodeID:"", Owner:github.User{}, Name:"", FullName:"", Description:"", Homepage:"", CodeOfConduct:github.CodeOfConduct{}, DefaultBranch:"", MasterBranch:"", CreatedAt:github.Timestamp{0001-01-01 00:00:00 +0000 UTC}, PushedAt:github.Timestamp{0001-01-01 00:00:00 +0000 UTC}, UpdatedAt:github.Timestamp{0001-01-01 00:00:00 +0000 UTC}, HTMLURL:"", CloneURL:"", GitURL:"", MirrorURL:"", SSHURL:"", SVNURL:"", Language:"", Fork:false, ForksCount:0, NetworkCount:0, OpenIssuesCount:0, OpenIssues:0, StargazersCount:0, SubscribersCount:0, WatchersCount:0, Watchers:0, Size:0, AutoInit:false, Parent:github.Repository{}, Source:github.Repository{}, TemplateRepository:github.Repository{}, Organization:github.Organization{}, AllowRebaseMerge:false, AllowUpdateBranch:false, AllowSquashMerge:false, AllowMergeCommit:false, AllowAutoMerge:false, AllowForking:false, DeleteBranchOnMerge:false, UseSquashPRTitleAsDefault:false, SquashMergeCommitTitle:"", SquashMergeCommitMessage:"", MergeCommitTitle:"", MergeCommitMessage:"", Topics:[""], Archived:false, Disabled:false, License:github.License{}, Private:false, HasIssues:false, HasWiki:false, HasPages:false, HasProjects:false, HasDownloads:false, IsTemplate:false, LicenseTemplate:"", GitignoreTemplate:"", SecurityAndAnalysis:github.SecurityAndAnalysis{}, TeamID:0, URL:"", ArchiveURL:"", AssigneesURL:"", BlobsURL:"", BranchesURL:"", CollaboratorsURL:"", CommentsURL:"", CommitsURL:"", CompareURL:"", ContentsURL:"", ContributorsURL:"", DeploymentsURL:"", DownloadsURL:"", EventsURL:"", ForksURL:"", GitCommitsURL:"", GitRefsURL:"", GitTagsURL:"", HooksURL:"", IssueCommentURL:"", IssueEventsURL:"", IssuesURL:"", KeysURL:"", LabelsURL:"", LanguagesURL:"", MergesURL:"", MilestonesURL:"", NotificationsURL:"", PullsURL:"", ReleasesURL:"", StargazersURL:"", StatusesURL:"", SubscribersURL:"", SubscriptionURL:"", TagsURL:"", TreesURL:"", TeamsURL:"", Visibility:"", RoleName:""}`
 	if got := v.String(); got != want {
 		t.Errorf("Repository.String = %v, want %v", got, want)
 	}
@@ -1703,6 +1714,19 @@ func TestRepositoryRelease_String(t *testing.T) {
 	}
 }
 
+func TestSSHSigningKey_String(t *testing.T) {
+	v := SSHSigningKey{
+		ID:        Int64(0),
+		Key:       String(""),
+		Title:     String(""),
+		CreatedAt: &Timestamp{},
+	}
+	want := `github.SSHSigningKey{ID:0, Key:"", Title:"", CreatedAt:github.Timestamp{0001-01-01 00:00:00 +0000 UTC}}`
+	if got := v.String(); got != want {
+		t.Errorf("SSHSigningKey.String = %v, want %v", got, want)
+	}
+}
+
 func TestSecretScanning_String(t *testing.T) {
 	v := SecretScanning{
 		Status: String(""),
@@ -1715,10 +1739,11 @@ func TestSecretScanning_String(t *testing.T) {
 
 func TestSecurityAndAnalysis_String(t *testing.T) {
 	v := SecurityAndAnalysis{
-		AdvancedSecurity: &AdvancedSecurity{},
-		SecretScanning:   &SecretScanning{},
+		AdvancedSecurity:             &AdvancedSecurity{},
+		SecretScanning:               &SecretScanning{},
+		SecretScanningPushProtection: &SecretScanningPushProtection{},
 	}
-	want := `github.SecurityAndAnalysis{AdvancedSecurity:github.AdvancedSecurity{}, SecretScanning:github.SecretScanning{}}`
+	want := `github.SecurityAndAnalysis{AdvancedSecurity:github.AdvancedSecurity{}, SecretScanning:github.SecretScanning{}, SecretScanningPushProtection:github.SecretScanningPushProtection{}}`
 	if got := v.String(); got != want {
 		t.Errorf("SecurityAndAnalysis.String = %v, want %v", got, want)
 	}

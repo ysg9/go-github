@@ -70,6 +70,10 @@ type Repository struct {
 	AllowForking              *bool           `json:"allow_forking,omitempty"`
 	DeleteBranchOnMerge       *bool           `json:"delete_branch_on_merge,omitempty"`
 	UseSquashPRTitleAsDefault *bool           `json:"use_squash_pr_title_as_default,omitempty"`
+	SquashMergeCommitTitle    *string         `json:"squash_merge_commit_title,omitempty"`   // Can be one of: "PR_TITLE", "COMMIT_OR_PR_TITLE"
+	SquashMergeCommitMessage  *string         `json:"squash_merge_commit_message,omitempty"` // Can be one of: "PR_BODY", "COMMIT_MESSAGES", "BLANK"
+	MergeCommitTitle          *string         `json:"merge_commit_title,omitempty"`          // Can be one of: "PR_TITLE", "MERGE_MESSAGE"
+	MergeCommitMessage        *string         `json:"merge_commit_message,omitempty"`        // Can be one of: "PR_BODY", "PR_TITLE", "BLANK"
 	Topics                    []string        `json:"topics,omitempty"`
 	Archived                  *bool           `json:"archived,omitempty"`
 	Disabled                  *bool           `json:"disabled,omitempty"`
@@ -201,8 +205,9 @@ type RepositoryListOptions struct {
 // SecurityAndAnalysis specifies the optional advanced security features
 // that are enabled on a given repository.
 type SecurityAndAnalysis struct {
-	AdvancedSecurity *AdvancedSecurity `json:"advanced_security,omitempty"`
-	SecretScanning   *SecretScanning   `json:"secret_scanning,omitempty"`
+	AdvancedSecurity             *AdvancedSecurity             `json:"advanced_security,omitempty"`
+	SecretScanning               *SecretScanning               `json:"secret_scanning,omitempty"`
+	SecretScanningPushProtection *SecretScanningPushProtection `json:"secret_scanning_push_protection,omitempty"`
 }
 
 func (s SecurityAndAnalysis) String() string {
@@ -229,6 +234,13 @@ type SecretScanning struct {
 
 func (s SecretScanning) String() string {
 	return Stringify(s)
+}
+
+// SecretScanningPushProtection specifies the state of secret scanning push protection on a repository.
+//
+// GitHub API docs: https://docs.github.com/en/code-security/secret-scanning/about-secret-scanning#about-secret-scanning-for-partner-patterns
+type SecretScanningPushProtection struct {
+	Status *string `json:"status,omitempty"`
 }
 
 // List the repositories for a user. Passing the empty string will list
@@ -374,6 +386,10 @@ type createRepoRequest struct {
 	AllowForking              *bool   `json:"allow_forking,omitempty"`
 	DeleteBranchOnMerge       *bool   `json:"delete_branch_on_merge,omitempty"`
 	UseSquashPRTitleAsDefault *bool   `json:"use_squash_pr_title_as_default,omitempty"`
+	SquashMergeCommitTitle    *string `json:"squash_merge_commit_title,omitempty"`
+	SquashMergeCommitMessage  *string `json:"squash_merge_commit_message,omitempty"`
+	MergeCommitTitle          *string `json:"merge_commit_title,omitempty"`
+	MergeCommitMessage        *string `json:"merge_commit_message,omitempty"`
 }
 
 // Create a new repository. If an organization is specified, the new
@@ -420,6 +436,10 @@ func (s *RepositoriesService) Create(ctx context.Context, org string, repo *Repo
 		AllowForking:              repo.AllowForking,
 		DeleteBranchOnMerge:       repo.DeleteBranchOnMerge,
 		UseSquashPRTitleAsDefault: repo.UseSquashPRTitleAsDefault,
+		SquashMergeCommitTitle:    repo.SquashMergeCommitTitle,
+		SquashMergeCommitMessage:  repo.SquashMergeCommitMessage,
+		MergeCommitTitle:          repo.MergeCommitTitle,
+		MergeCommitMessage:        repo.MergeCommitMessage,
 	}
 
 	req, err := s.client.NewRequest("POST", u, repoReq)
@@ -725,10 +745,10 @@ func (s *RepositoriesService) ListContributors(ctx context.Context, owner string
 // specifies the languages and the number of bytes of code written in that
 // language. For example:
 //
-//     {
-//       "C": 78769,
-//       "Python": 7769
-//     }
+//	{
+//	  "C": 78769,
+//	  "Python": 7769
+//	}
 //
 // GitHub API docs: https://docs.github.com/en/rest/repos/repos#list-repository-languages
 func (s *RepositoriesService) ListLanguages(ctx context.Context, owner string, repo string) (map[string]int, *Response, error) {
@@ -852,8 +872,31 @@ type BranchProtectionRule struct {
 
 // ProtectionChanges represents the changes to the rule if the BranchProtection was edited.
 type ProtectionChanges struct {
-	AuthorizedActorsOnly *AuthorizedActorsOnly `json:"authorized_actors_only,omitempty"`
-	AuthorizedActorNames *AuthorizedActorNames `json:"authorized_actor_names,omitempty"`
+	AdminEnforced                            *AdminEnforcedChanges                            `json:"admin_enforced,omitempty"`
+	AllowDeletionsEnforcementLevel           *AllowDeletionsEnforcementLevelChanges           `json:"allow_deletions_enforcement_level,omitempty"`
+	AuthorizedActorNames                     *AuthorizedActorNames                            `json:"authorized_actor_names,omitempty"`
+	AuthorizedActorsOnly                     *AuthorizedActorsOnly                            `json:"authorized_actors_only,omitempty"`
+	AuthorizedDismissalActorsOnly            *AuthorizedDismissalActorsOnlyChanges            `json:"authorized_dismissal_actors_only,omitempty"`
+	CreateProtected                          *CreateProtectedChanges                          `json:"create_protected,omitempty"`
+	DismissStaleReviewsOnPush                *DismissStaleReviewsOnPushChanges                `json:"dismiss_stale_reviews_on_push,omitempty"`
+	LinearHistoryRequirementEnforcementLevel *LinearHistoryRequirementEnforcementLevelChanges `json:"linear_history_requirement_enforcement_level,omitempty"`
+	PullRequestReviewsEnforcementLevel       *PullRequestReviewsEnforcementLevelChanges       `json:"pull_request_reviews_enforcement_level,omitempty"`
+	RequireCodeOwnerReview                   *RequireCodeOwnerReviewChanges                   `json:"require_code_owner_review,omitempty"`
+	RequiredConversationResolutionLevel      *RequiredConversationResolutionLevelChanges      `json:"required_conversation_resolution_level,omitempty"`
+	RequiredDeploymentsEnforcementLevel      *RequiredDeploymentsEnforcementLevelChanges      `json:"required_deployments_enforcement_level,omitempty"`
+	RequiredStatusChecks                     *RequiredStatusChecksChanges                     `json:"required_status_checks,omitempty"`
+	RequiredStatusChecksEnforcementLevel     *RequiredStatusChecksEnforcementLevelChanges     `json:"required_status_checks_enforcement_level,omitempty"`
+	SignatureRequirementEnforcementLevel     *SignatureRequirementEnforcementLevelChanges     `json:"signature_requirement_enforcement_level,omitempty"`
+}
+
+// AdminEnforcedChanges represents the changes made to the AdminEnforced policy.
+type AdminEnforcedChanges struct {
+	From *bool `json:"from,omitempty"`
+}
+
+// AllowDeletionsEnforcementLevelChanges represents the changes made to the AllowDeletionsEnforcementLevel policy.
+type AllowDeletionsEnforcementLevelChanges struct {
+	From *string `json:"from,omitempty"`
 }
 
 // AuthorizedActorNames represents who are authorized to edit the branch protection rules.
@@ -861,9 +904,64 @@ type AuthorizedActorNames struct {
 	From []string `json:"from,omitempty"`
 }
 
-// AuthorizedActorsOnly represents if the branche rule can be edited by authorized actors only.
+// AuthorizedActorsOnly represents if the branch rule can be edited by authorized actors only.
 type AuthorizedActorsOnly struct {
 	From *bool `json:"from,omitempty"`
+}
+
+// AuthorizedDismissalActorsOnlyChanges represents the changes made to the AuthorizedDismissalActorsOnly policy.
+type AuthorizedDismissalActorsOnlyChanges struct {
+	From *bool `json:"from,omitempty"`
+}
+
+// CreateProtectedChanges represents the changes made to the CreateProtected policy.
+type CreateProtectedChanges struct {
+	From *bool `json:"from,omitempty"`
+}
+
+// DismissStaleReviewsOnPushChanges represents the changes made to the DismissStaleReviewsOnPushChanges policy.
+type DismissStaleReviewsOnPushChanges struct {
+	From *bool `json:"from,omitempty"`
+}
+
+// LinearHistoryRequirementEnforcementLevelChanges represents the changes made to the LinearHistoryRequirementEnforcementLevel policy.
+type LinearHistoryRequirementEnforcementLevelChanges struct {
+	From *string `json:"from,omitempty"`
+}
+
+// PullRequestReviewsEnforcementLevelChanges represents the changes made to the PullRequestReviewsEnforcementLevel policy.
+type PullRequestReviewsEnforcementLevelChanges struct {
+	From *string `json:"from,omitempty"`
+}
+
+// RequireCodeOwnerReviewChanges represents the changes made to the RequireCodeOwnerReview policy.
+type RequireCodeOwnerReviewChanges struct {
+	From *bool `json:"from,omitempty"`
+}
+
+// RequiredConversationResolutionLevelChanges represents the changes made to the RequiredConversationResolutionLevel policy.
+type RequiredConversationResolutionLevelChanges struct {
+	From *string `json:"from,omitempty"`
+}
+
+// RequiredDeploymentsEnforcementLevelChanges represents the changes made to the RequiredDeploymentsEnforcementLevel policy.
+type RequiredDeploymentsEnforcementLevelChanges struct {
+	From *string `json:"from,omitempty"`
+}
+
+// RequiredStatusChecksChanges represents the changes made to the RequiredStatusChecks policy.
+type RequiredStatusChecksChanges struct {
+	From []string `json:"from,omitempty"`
+}
+
+// RequiredStatusChecksEnforcementLevelChanges represents the changes made to the RequiredStatusChecksEnforcementLevel policy.
+type RequiredStatusChecksEnforcementLevelChanges struct {
+	From *string `json:"from,omitempty"`
+}
+
+// SignatureRequirementEnforcementLevelChanges represents the changes made to the SignatureRequirementEnforcementLevel policy.
+type SignatureRequirementEnforcementLevelChanges struct {
+	From *string `json:"from,omitempty"`
 }
 
 // ProtectionRequest represents a request to create/edit a branch's protection.
@@ -893,7 +991,7 @@ type RequiredStatusChecks struct {
 	Contexts []string `json:"contexts,omitempty"`
 	// The list of status checks to require in order to merge into this
 	// branch.
-	Checks []*RequiredStatusCheck `json:"checks,omitempty"`
+	Checks []*RequiredStatusCheck `json:"checks"`
 }
 
 // RequiredStatusChecksRequest represents a request to edit a protected branch's status checks.
@@ -919,7 +1017,9 @@ type RequiredStatusCheck struct {
 
 // PullRequestReviewsEnforcement represents the pull request reviews enforcement of a protected branch.
 type PullRequestReviewsEnforcement struct {
-	// Specifies which users and teams can dismiss pull request reviews.
+	// Allow specific users, teams, or apps to bypass pull request requirements.
+	BypassPullRequestAllowances *BypassPullRequestAllowances `json:"bypass_pull_request_allowances,omitempty"`
+	// Specifies which users, teams and apps can dismiss pull request reviews.
 	DismissalRestrictions *DismissalRestrictions `json:"dismissal_restrictions,omitempty"`
 	// Specifies if approved reviews are dismissed automatically, when a new commit is pushed.
 	DismissStaleReviews bool `json:"dismiss_stale_reviews"`
@@ -934,8 +1034,10 @@ type PullRequestReviewsEnforcement struct {
 // enforcement of a protected branch. It is separate from PullRequestReviewsEnforcement above
 // because the request structure is different from the response structure.
 type PullRequestReviewsEnforcementRequest struct {
-	// Specifies which users and teams should be allowed to dismiss pull request reviews.
-	// User and team dismissal restrictions are only available for
+	// Allow specific users, teams, or apps to bypass pull request requirements.
+	BypassPullRequestAllowancesRequest *BypassPullRequestAllowancesRequest `json:"bypass_pull_request_allowances,omitempty"`
+	// Specifies which users, teams and apps should be allowed to dismiss pull request reviews.
+	// User, team and app dismissal restrictions are only available for
 	// organization-owned repositories. Must be nil for personal repositories.
 	DismissalRestrictionsRequest *DismissalRestrictionsRequest `json:"dismissal_restrictions,omitempty"`
 	// Specifies if approved reviews can be dismissed automatically, when a new commit is pushed. (Required)
@@ -951,7 +1053,9 @@ type PullRequestReviewsEnforcementRequest struct {
 // enforcement of a protected branch. It is separate from PullRequestReviewsEnforcementRequest above
 // because the patch request does not require all fields to be initialized.
 type PullRequestReviewsEnforcementUpdate struct {
-	// Specifies which users and teams can dismiss pull request reviews. Can be omitted.
+	// Allow specific users, teams, or apps to bypass pull request requirements.
+	BypassPullRequestAllowancesRequest *BypassPullRequestAllowancesRequest `json:"bypass_pull_request_allowances,omitempty"`
+	// Specifies which users, teams and apps can dismiss pull request reviews. Can be omitted.
 	DismissalRestrictionsRequest *DismissalRestrictionsRequest `json:"dismissal_restrictions,omitempty"`
 	// Specifies if approved reviews can be dismissed automatically, when a new commit is pushed. Can be omitted.
 	DismissStaleReviews *bool `json:"dismiss_stale_reviews,omitempty"`
@@ -1009,7 +1113,30 @@ type BranchRestrictionsRequest struct {
 	// The list of team slugs with push access. (Required; use []string{} instead of nil for empty list.)
 	Teams []string `json:"teams"`
 	// The list of app slugs with push access.
-	Apps []string `json:"apps,omitempty"`
+	Apps []string `json:"apps"`
+}
+
+// BypassPullRequestAllowances represents the people, teams, or apps who are allowed to bypass required pull requests.
+type BypassPullRequestAllowances struct {
+	// The list of users allowed to bypass pull request requirements.
+	Users []*User `json:"users"`
+	// The list of teams allowed to bypass pull request requirements.
+	Teams []*Team `json:"teams"`
+	// The list of apps allowed to bypass pull request requirements.
+	Apps []*App `json:"apps"`
+}
+
+// BypassPullRequestAllowancesRequest represents the people, teams, or apps who are
+// allowed to bypass required pull requests.
+// It is separate from BypassPullRequestAllowances above because the request structure is
+// different from the response structure.
+type BypassPullRequestAllowancesRequest struct {
+	// The list of user logins allowed to bypass pull request requirements.
+	Users []string `json:"users"`
+	// The list of team slugs allowed to bypass pull request requirements.
+	Teams []string `json:"teams"`
+	// The list of app slugs allowed to bypass pull request requirements.
+	Apps []string `json:"apps"`
 }
 
 // DismissalRestrictions specifies which users and teams can dismiss pull request reviews.
@@ -1018,10 +1145,12 @@ type DismissalRestrictions struct {
 	Users []*User `json:"users"`
 	// The list of teams which can dismiss pull request reviews.
 	Teams []*Team `json:"teams"`
+	// The list of apps which can dismiss pull request reviews.
+	Apps []*App `json:"apps"`
 }
 
 // DismissalRestrictionsRequest represents the request to create/edit the
-// restriction to allows only specific users or teams to dimiss pull request reviews. It is
+// restriction to allows only specific users, teams or apps to dimiss pull request reviews. It is
 // separate from DismissalRestrictions above because the request structure is
 // different from the response structure.
 // Note: Both Users and Teams must be nil, or both must be non-nil.
@@ -1030,6 +1159,8 @@ type DismissalRestrictionsRequest struct {
 	Users *[]string `json:"users,omitempty"`
 	// The list of team slugs which can dismiss pull request reviews. (Required; use nil to disable dismissal_restrictions or &[]string{} otherwise.)
 	Teams *[]string `json:"teams,omitempty"`
+	// The list of apps which can dismiss pull request reviews. (Required; use nil to disable dismissal_restrictions or &[]string{} otherwise.)
+	Apps *[]string `json:"apps,omitempty"`
 }
 
 // SignaturesProtectedBranch represents the protection status of an individual branch.

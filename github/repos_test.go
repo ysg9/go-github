@@ -360,7 +360,7 @@ func TestRepositoriesService_Get(t *testing.T) {
 	mux.HandleFunc("/repos/o/r", func(w http.ResponseWriter, r *http.Request) {
 		testMethod(t, r, "GET")
 		testHeader(t, r, "Accept", strings.Join(wantAcceptHeaders, ", "))
-		fmt.Fprint(w, `{"id":1,"name":"n","description":"d","owner":{"login":"l"},"license":{"key":"mit"},"security_and_analysis":{"advanced_security":{"status":"enabled"},"secret_scanning":{"status":"enabled"}}}`)
+		fmt.Fprint(w, `{"id":1,"name":"n","description":"d","owner":{"login":"l"},"license":{"key":"mit"},"security_and_analysis":{"advanced_security":{"status":"enabled"},"secret_scanning":{"status":"enabled"},"secret_scanning_push_protection":{"status":"enabled"}}}`)
 	})
 
 	ctx := context.Background()
@@ -369,7 +369,7 @@ func TestRepositoriesService_Get(t *testing.T) {
 		t.Errorf("Repositories.Get returned error: %v", err)
 	}
 
-	want := &Repository{ID: Int64(1), Name: String("n"), Description: String("d"), Owner: &User{Login: String("l")}, License: &License{Key: String("mit")}, SecurityAndAnalysis: &SecurityAndAnalysis{AdvancedSecurity: &AdvancedSecurity{Status: String("enabled")}, SecretScanning: &SecretScanning{String("enabled")}}}
+	want := &Repository{ID: Int64(1), Name: String("n"), Description: String("d"), Owner: &User{Login: String("l")}, License: &License{Key: String("mit")}, SecurityAndAnalysis: &SecurityAndAnalysis{AdvancedSecurity: &AdvancedSecurity{Status: String("enabled")}, SecretScanning: &SecretScanning{String("enabled")}, SecretScanningPushProtection: &SecretScanningPushProtection{String("enabled")}}}
 	if !cmp.Equal(got, want) {
 		t.Errorf("Repositories.Get returned %+v, want %+v", got, want)
 	}
@@ -1074,6 +1074,10 @@ func TestRepositoriesService_GetBranchProtection(t *testing.T) {
 						"teams":[{
 							"id":4,
 							"slug":"t"
+						}],
+						"apps":[{
+							"id":5,
+							"slug":"a"
 						}]
 					},
 					"dismiss_stale_reviews":true,
@@ -1086,7 +1090,8 @@ func TestRepositoriesService_GetBranchProtection(t *testing.T) {
 					},
 					"restrictions":{
 						"users":[{"id":1,"login":"u"}],
-						"teams":[{"id":2,"slug":"t"}]
+						"teams":[{"id":2,"slug":"t"}],
+						"apps":[{"id":3,"slug":"a"}]
 					},
 					"required_conversation_resolution": {
 						"enabled": true
@@ -1119,6 +1124,9 @@ func TestRepositoriesService_GetBranchProtection(t *testing.T) {
 				Teams: []*Team{
 					{Slug: String("t"), ID: Int64(4)},
 				},
+				Apps: []*App{
+					{Slug: String("a"), ID: Int64(5)},
+				},
 			},
 			RequireCodeOwnerReviews:      true,
 			RequiredApprovingReviewCount: 1,
@@ -1133,6 +1141,9 @@ func TestRepositoriesService_GetBranchProtection(t *testing.T) {
 			},
 			Teams: []*Team{
 				{Slug: String("t"), ID: Int64(2)},
+			},
+			Apps: []*App{
+				{Slug: String("a"), ID: Int64(3)},
 			},
 		},
 		RequiredConversationResolution: &RequiredConversationResolution{
@@ -1273,6 +1284,12 @@ func TestRepositoriesService_UpdateBranchProtection_Contexts(t *testing.T) {
 			DismissalRestrictionsRequest: &DismissalRestrictionsRequest{
 				Users: &[]string{"uu"},
 				Teams: &[]string{"tt"},
+				Apps:  &[]string{"aa"},
+			},
+			BypassPullRequestAllowancesRequest: &BypassPullRequestAllowancesRequest{
+				Users: []string{"uuu"},
+				Teams: []string{"ttt"},
+				Apps:  []string{"aaa"},
 			},
 		},
 		Restrictions: &BranchRestrictionsRequest{
@@ -1313,10 +1330,19 @@ func TestRepositoriesService_UpdateBranchProtection_Contexts(t *testing.T) {
 					"teams":[{
 						"id":4,
 						"slug":"tt"
+					}],
+					"apps":[{
+						"id":5,
+						"slug":"aa"
 					}]
 				},
 				"dismiss_stale_reviews":true,
-				"require_code_owner_reviews":true
+				"require_code_owner_reviews":true,
+				"bypass_pull_request_allowances": {
+					"users":[{"id":10,"login":"uuu"}],
+					"teams":[{"id":20,"slug":"ttt"}],
+					"apps":[{"id":30,"slug":"aaa"}]
+				}
 			},
 			"restrictions":{
 				"users":[{"id":1,"login":"u"}],
@@ -1351,8 +1377,22 @@ func TestRepositoriesService_UpdateBranchProtection_Contexts(t *testing.T) {
 				Teams: []*Team{
 					{Slug: String("tt"), ID: Int64(4)},
 				},
+				Apps: []*App{
+					{Slug: String("aa"), ID: Int64(5)},
+				},
 			},
 			RequireCodeOwnerReviews: true,
+			BypassPullRequestAllowances: &BypassPullRequestAllowances{
+				Users: []*User{
+					{Login: String("uuu"), ID: Int64(10)},
+				},
+				Teams: []*Team{
+					{Slug: String("ttt"), ID: Int64(20)},
+				},
+				Apps: []*App{
+					{Slug: String("aaa"), ID: Int64(30)},
+				},
+			},
 		},
 		Restrictions: &BranchRestrictions{
 			Users: []*User{
@@ -1403,6 +1443,12 @@ func TestRepositoriesService_UpdateBranchProtection_Checks(t *testing.T) {
 			DismissalRestrictionsRequest: &DismissalRestrictionsRequest{
 				Users: &[]string{"uu"},
 				Teams: &[]string{"tt"},
+				Apps:  &[]string{"aa"},
+			},
+			BypassPullRequestAllowancesRequest: &BypassPullRequestAllowancesRequest{
+				Users: []string{"uuu"},
+				Teams: []string{"ttt"},
+				Apps:  []string{"aaa"},
 			},
 		},
 		Restrictions: &BranchRestrictionsRequest{
@@ -1443,10 +1489,19 @@ func TestRepositoriesService_UpdateBranchProtection_Checks(t *testing.T) {
 					"teams":[{
 						"id":4,
 						"slug":"tt"
+					}],
+					"apps":[{
+						"id":5,
+						"slug":"aa"
 					}]
 				},
 				"dismiss_stale_reviews":true,
-				"require_code_owner_reviews":true
+				"require_code_owner_reviews":true,
+				"bypass_pull_request_allowances": {
+					"users":[{"id":10,"login":"uuu"}],
+					"teams":[{"id":20,"slug":"ttt"}],
+					"apps":[{"id":30,"slug":"aaa"}]
+				}
 			},
 			"restrictions":{
 				"users":[{"id":1,"login":"u"}],
@@ -1481,8 +1536,154 @@ func TestRepositoriesService_UpdateBranchProtection_Checks(t *testing.T) {
 				Teams: []*Team{
 					{Slug: String("tt"), ID: Int64(4)},
 				},
+				Apps: []*App{
+					{Slug: String("aa"), ID: Int64(5)},
+				},
 			},
 			RequireCodeOwnerReviews: true,
+			BypassPullRequestAllowances: &BypassPullRequestAllowances{
+				Users: []*User{
+					{Login: String("uuu"), ID: Int64(10)},
+				},
+				Teams: []*Team{
+					{Slug: String("ttt"), ID: Int64(20)},
+				},
+				Apps: []*App{
+					{Slug: String("aaa"), ID: Int64(30)},
+				},
+			},
+		},
+		Restrictions: &BranchRestrictions{
+			Users: []*User{
+				{Login: String("u"), ID: Int64(1)},
+			},
+			Teams: []*Team{
+				{Slug: String("t"), ID: Int64(2)},
+			},
+			Apps: []*App{
+				{Slug: String("a"), ID: Int64(3)},
+			},
+		},
+	}
+	if !cmp.Equal(protection, want) {
+		t.Errorf("Repositories.UpdateBranchProtection returned %+v, want %+v", protection, want)
+	}
+}
+
+func TestRepositoriesService_UpdateBranchProtection_StrictNoChecks(t *testing.T) {
+	client, mux, _, teardown := setup()
+	defer teardown()
+
+	input := &ProtectionRequest{
+		RequiredStatusChecks: &RequiredStatusChecks{
+			Strict: true,
+			Checks: []*RequiredStatusCheck{},
+		},
+		RequiredPullRequestReviews: &PullRequestReviewsEnforcementRequest{
+			DismissStaleReviews: true,
+			DismissalRestrictionsRequest: &DismissalRestrictionsRequest{
+				Users: &[]string{"uu"},
+				Teams: &[]string{"tt"},
+				Apps:  &[]string{"aa"},
+			},
+			BypassPullRequestAllowancesRequest: &BypassPullRequestAllowancesRequest{
+				Users: []string{"uuu"},
+				Teams: []string{"ttt"},
+				Apps:  []string{"aaa"},
+			},
+		},
+		Restrictions: &BranchRestrictionsRequest{
+			Users: []string{"u"},
+			Teams: []string{"t"},
+			Apps:  []string{"a"},
+		},
+	}
+
+	mux.HandleFunc("/repos/o/r/branches/b/protection", func(w http.ResponseWriter, r *http.Request) {
+		v := new(ProtectionRequest)
+		json.NewDecoder(r.Body).Decode(v)
+
+		testMethod(t, r, "PUT")
+		if !cmp.Equal(v, input) {
+			t.Errorf("Request body = %+v, want %+v", v, input)
+		}
+
+		// TODO: remove custom Accept header when this API fully launches
+		testHeader(t, r, "Accept", mediaTypeRequiredApprovingReviewsPreview)
+		fmt.Fprintf(w, `{
+			"required_status_checks":{
+				"strict":true,
+				"contexts":[],
+				"checks": []
+			},
+			"required_pull_request_reviews":{
+				"dismissal_restrictions":{
+					"users":[{
+						"id":3,
+						"login":"uu"
+					}],
+					"teams":[{
+						"id":4,
+						"slug":"tt"
+					}],
+					"apps":[{
+						"id":5,
+						"slug":"aa"
+					}]
+				},
+				"dismiss_stale_reviews":true,
+				"require_code_owner_reviews":true,
+				"bypass_pull_request_allowances": {
+					"users":[{"id":10,"login":"uuu"}],
+					"teams":[{"id":20,"slug":"ttt"}],
+					"apps":[{"id":30,"slug":"aaa"}]
+				}
+			},
+			"restrictions":{
+				"users":[{"id":1,"login":"u"}],
+				"teams":[{"id":2,"slug":"t"}],
+				"apps":[{"id":3,"slug":"a"}]
+			}
+		}`)
+	})
+
+	ctx := context.Background()
+	protection, _, err := client.Repositories.UpdateBranchProtection(ctx, "o", "r", "b", input)
+	if err != nil {
+		t.Errorf("Repositories.UpdateBranchProtection returned error: %v", err)
+	}
+
+	want := &Protection{
+		RequiredStatusChecks: &RequiredStatusChecks{
+			Strict:   true,
+			Contexts: []string{},
+			Checks:   []*RequiredStatusCheck{},
+		},
+		RequiredPullRequestReviews: &PullRequestReviewsEnforcement{
+			DismissStaleReviews: true,
+			DismissalRestrictions: &DismissalRestrictions{
+				Users: []*User{
+					{Login: String("uu"), ID: Int64(3)},
+				},
+				Teams: []*Team{
+					{Slug: String("tt"), ID: Int64(4)},
+				},
+				Apps: []*App{
+					{Slug: String("aa"), ID: Int64(5)},
+				},
+			},
+			RequireCodeOwnerReviews: true,
+			BypassPullRequestAllowances: &BypassPullRequestAllowances{
+				Users: []*User{
+					{Login: String("uuu"), ID: Int64(10)},
+				},
+				Teams: []*Team{
+					{Slug: String("ttt"), ID: Int64(20)},
+				},
+				Apps: []*App{
+					{Slug: String("aaa"), ID: Int64(30)},
+				},
+			},
 		},
 		Restrictions: &BranchRestrictions{
 			Users: []*User{
@@ -1922,7 +2123,8 @@ func TestRepositoriesService_GetPullRequestReviewEnforcement(t *testing.T) {
 		fmt.Fprintf(w, `{
 			"dismissal_restrictions":{
 				"users":[{"id":1,"login":"u"}],
-				"teams":[{"id":2,"slug":"t"}]
+				"teams":[{"id":2,"slug":"t"}],
+				"apps":[{"id":3,"slug":"a"}]
 			},
 			"dismiss_stale_reviews":true,
 			"require_code_owner_reviews":true,
@@ -1944,6 +2146,9 @@ func TestRepositoriesService_GetPullRequestReviewEnforcement(t *testing.T) {
 			},
 			Teams: []*Team{
 				{Slug: String("t"), ID: Int64(2)},
+			},
+			Apps: []*App{
+				{Slug: String("a"), ID: Int64(3)},
 			},
 		},
 		RequireCodeOwnerReviews:      true,
@@ -1977,6 +2182,7 @@ func TestRepositoriesService_UpdatePullRequestReviewEnforcement(t *testing.T) {
 		DismissalRestrictionsRequest: &DismissalRestrictionsRequest{
 			Users: &[]string{"u"},
 			Teams: &[]string{"t"},
+			Apps:  &[]string{"a"},
 		},
 	}
 
@@ -1993,7 +2199,8 @@ func TestRepositoriesService_UpdatePullRequestReviewEnforcement(t *testing.T) {
 		fmt.Fprintf(w, `{
 			"dismissal_restrictions":{
 				"users":[{"id":1,"login":"u"}],
-				"teams":[{"id":2,"slug":"t"}]
+				"teams":[{"id":2,"slug":"t"}],
+				"apps":[{"id":3,"slug":"a"}]
 			},
 			"dismiss_stale_reviews":true,
 			"require_code_owner_reviews":true,
@@ -2015,6 +2222,9 @@ func TestRepositoriesService_UpdatePullRequestReviewEnforcement(t *testing.T) {
 			},
 			Teams: []*Team{
 				{Slug: String("t"), ID: Int64(2)},
+			},
+			Apps: []*App{
+				{Slug: String("a"), ID: Int64(3)},
 			},
 		},
 		RequireCodeOwnerReviews:      true,
@@ -2349,6 +2559,7 @@ func TestPullRequestReviewsEnforcementRequest_MarshalJSON_nilDismissalRestirctio
 		DismissalRestrictionsRequest: &DismissalRestrictionsRequest{
 			Users: &[]string{},
 			Teams: &[]string{},
+			Apps:  &[]string{},
 		},
 	}
 
@@ -2357,7 +2568,7 @@ func TestPullRequestReviewsEnforcementRequest_MarshalJSON_nilDismissalRestirctio
 		t.Errorf("PullRequestReviewsEnforcementRequest.MarshalJSON returned error: %v", err)
 	}
 
-	want = `{"dismissal_restrictions":{"users":[],"teams":[]},"dismiss_stale_reviews":false,"require_code_owner_reviews":false,"required_approving_review_count":0}`
+	want = `{"dismissal_restrictions":{"users":[],"teams":[],"apps":[]},"dismiss_stale_reviews":false,"require_code_owner_reviews":false,"required_approving_review_count":0}`
 	if want != string(got) {
 		t.Errorf("PullRequestReviewsEnforcementRequest.MarshalJSON returned %+v, want %+v", string(got), want)
 	}
@@ -2787,6 +2998,147 @@ func TestAuthorizedActorsOnly_Marshal(t *testing.T) {
 
 	want := `{
 		"from" : true
+	}`
+
+	testJSONMarshal(t, u, want)
+}
+
+func TestDispatchRequestOptions_Marshal(t *testing.T) {
+	testJSONMarshal(t, &DispatchRequestOptions{}, "{}")
+
+	cp := json.RawMessage(`{"testKey":"testValue"}`)
+	u := &DispatchRequestOptions{
+		EventType:     "test_event_type",
+		ClientPayload: &cp,
+	}
+
+	want := `{
+		"event_type": "test_event_type",
+		"client_payload": {
+		  "testKey": "testValue"
+		}
+	  }`
+
+	testJSONMarshal(t, u, want)
+}
+
+func TestTransferRequest_Marshal(t *testing.T) {
+	testJSONMarshal(t, &TransferRequest{}, "{}")
+
+	u := &TransferRequest{
+		NewOwner: "testOwner",
+		TeamID:   []int64{1, 2},
+	}
+
+	want := `{
+		"new_owner": "testOwner",
+		"team_ids": [1,2]
+	}`
+
+	testJSONMarshal(t, u, want)
+}
+
+func TestSignaturesProtectedBranch_Marshal(t *testing.T) {
+	testJSONMarshal(t, &SignaturesProtectedBranch{}, "{}")
+
+	u := &SignaturesProtectedBranch{
+		URL:     String("https://www.testURL.in"),
+		Enabled: Bool(false),
+	}
+
+	want := `{
+		"url": "https://www.testURL.in",
+		"enabled": false
+	}`
+
+	testJSONMarshal(t, u, want)
+
+	u2 := &SignaturesProtectedBranch{
+		URL:     String("testURL"),
+		Enabled: Bool(true),
+	}
+
+	want2 := `{
+		"url": "testURL",
+		"enabled": true
+	}`
+
+	testJSONMarshal(t, u2, want2)
+}
+
+func TestDismissalRestrictionsRequest_Marshal(t *testing.T) {
+	testJSONMarshal(t, &DismissalRestrictionsRequest{}, "{}")
+
+	u := &DismissalRestrictionsRequest{
+		Users: &[]string{"user1", "user2"},
+		Teams: &[]string{"team1", "team2"},
+		Apps:  &[]string{"app1", "app2"},
+	}
+
+	want := `{
+		"users": ["user1","user2"],
+		"teams": ["team1","team2"],
+		"apps": ["app1","app2"]
+	}`
+
+	testJSONMarshal(t, u, want)
+}
+
+func TestAdminEnforcement_Marshal(t *testing.T) {
+	testJSONMarshal(t, &AdminEnforcement{}, "{}")
+
+	u := &AdminEnforcement{
+		URL:     String("https://www.test-url.in"),
+		Enabled: false,
+	}
+
+	want := `{
+		"url": "https://www.test-url.in",
+		"enabled": false
+	}`
+
+	testJSONMarshal(t, u, want)
+}
+
+func TestPullRequestReviewsEnforcementUpdate_Marshal(t *testing.T) {
+	testJSONMarshal(t, &PullRequestReviewsEnforcementUpdate{}, "{}")
+
+	u := &PullRequestReviewsEnforcementUpdate{
+		BypassPullRequestAllowancesRequest: &BypassPullRequestAllowancesRequest{
+			Users: []string{"user1", "user2"},
+			Teams: []string{"team1", "team2"},
+			Apps:  []string{"app1", "app2"},
+		},
+		DismissStaleReviews:          Bool(false),
+		RequireCodeOwnerReviews:      Bool(true),
+		RequiredApprovingReviewCount: 2,
+	}
+
+	want := `{
+		"bypass_pull_request_allowances": {
+			"users": ["user1","user2"],
+			"teams": ["team1","team2"],
+			"apps": ["app1","app2"]
+		},
+		"dismiss_stale_reviews": false,
+		"require_code_owner_reviews": true,
+		"required_approving_review_count": 2
+	}`
+
+	testJSONMarshal(t, u, want)
+}
+
+func TestRequiredStatusCheck_Marshal(t *testing.T) {
+	testJSONMarshal(t, &RequiredStatusCheck{}, "{}")
+
+	u := &RequiredStatusCheck{
+		Context: "ctx",
+		AppID:   Int64(1),
+	}
+
+	want := `{
+		"context": "ctx",
+		"app_id": 1
 	}`
 
 	testJSONMarshal(t, u, want)

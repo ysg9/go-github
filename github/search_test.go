@@ -9,6 +9,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"strings"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -59,6 +60,85 @@ func TestSearchService_Repositories_coverage(t *testing.T) {
 		_, _, err = client.Search.Repositories(ctx, "\n", nil)
 		return err
 	})
+}
+
+func TestSearchService_RepositoriesTextMatch(t *testing.T) {
+	client, mux, _, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/search/repositories", func(w http.ResponseWriter, r *http.Request) {
+		testMethod(t, r, "GET")
+		textMatchResponse := `
+			{
+				"total_count": 1,
+				"incomplete_results": false,
+				"items": [
+					{
+						"name":"gopher1"
+					}
+				]
+			}
+		`
+		list := strings.Split(r.Header.Get("Accept"), ",")
+		aMap := make(map[string]struct{})
+		for _, s := range list {
+			aMap[strings.TrimSpace(s)] = struct{}{}
+		}
+		if _, ok := aMap["application/vnd.github.v3.text-match+json"]; ok {
+			textMatchResponse = `
+					{
+						"total_count": 1,
+						"incomplete_results": false,
+						"items": [
+							{
+								"name":"gopher1",
+								"text_matches": [
+									{
+										"fragment": "I'm afraid my friend what you have found\nIs a gopher who lives to feed",
+										"matches": [
+											{
+												"text": "gopher",
+												"indices": [
+													14,
+													21
+											]
+											}
+									  ]
+								  }
+							  ]
+							}
+						]
+					}
+				`
+		}
+
+		fmt.Fprint(w, textMatchResponse)
+	})
+
+	opts := &SearchOptions{Sort: "forks", Order: "desc", ListOptions: ListOptions{Page: 2, PerPage: 2}, TextMatch: true}
+	ctx := context.Background()
+	result, _, err := client.Search.Repositories(ctx, "blah", opts)
+	if err != nil {
+		t.Errorf("Search.Code returned error: %v", err)
+	}
+
+	wantedRepoResult := &Repository{
+		Name: String("gopher1"),
+		TextMatches: []*TextMatch{{
+			Fragment: String("I'm afraid my friend what you have found\nIs a gopher who lives to feed"),
+			Matches:  []*Match{{Text: String("gopher"), Indices: []int{14, 21}}},
+		},
+		},
+	}
+
+	want := &RepositoriesSearchResult{
+		Total:             Int(1),
+		IncompleteResults: Bool(false),
+		Repositories:      []*Repository{wantedRepoResult},
+	}
+	if !cmp.Equal(result, want) {
+		t.Errorf("Search.Repo returned %+v, want %+v", result, want)
+	}
 }
 
 func TestSearchService_Topics(t *testing.T) {
@@ -792,6 +872,137 @@ func TestIssuesSearchResult_Marshal(t *testing.T) {
 				"active_lock_reason": "alr"
 			}
 		]
+	}`
+
+	testJSONMarshal(t, u, want)
+}
+
+func TestLabelsSearchResult_Marshal(t *testing.T) {
+	testJSONMarshal(t, &LabelsSearchResult{}, "{}")
+
+	u := &LabelsSearchResult{
+		Total:             Int(5),
+		IncompleteResults: Bool(false),
+		Labels: []*LabelResult{
+			{
+				ID:          Int64(1),
+				URL:         String("https://www.test-url.com"),
+				Name:        String("test name"),
+				Color:       String("green"),
+				Default:     Bool(true),
+				Description: String("testDescription"),
+				Score:       Float64(1),
+			},
+		},
+	}
+
+	want := `{
+		"total_count": 5,
+		"incomplete_results": false,
+		"items": [
+			{
+				"id": 1,
+				"url": "https://www.test-url.com",
+				"name": "test name",
+				"color": "green",
+				"default": true,
+				"description": "testDescription",
+				"score": 1
+			}
+		]
+	}`
+
+	testJSONMarshal(t, u, want)
+}
+
+func TestCommitResult_Marshal(t *testing.T) {
+	testJSONMarshal(t, &CommitResult{}, "{}")
+
+	c := &CommitResult{
+		SHA:         String("test"),
+		HTMLURL:     String("hurl"),
+		CommentsURL: String("curl"),
+		URL:         String("url"),
+		Repository:  &Repository{ID: Int64(1)},
+		Score:       Float64(123),
+		Commit:      &Commit{SHA: String("test")},
+		Author:      &User{ID: Int64(1)},
+		Committer:   &User{ID: Int64(1)},
+		Parents:     []*Commit{},
+	}
+
+	want := `{
+		"sha": "test",
+		"commit": {
+		   "sha": "test"
+		},
+		"author": {
+		   "id": 1
+		},
+		"committer": {
+		   "id": 1
+		},
+		"html_url": "hurl",
+		"url": "url",
+		"comments_url": "curl",
+		"repository": {
+		   "id": 1
+		},
+		"score": 123
+	 }`
+
+	testJSONMarshal(t, c, want)
+}
+
+func TestUsersSearchResult_Marshal(t *testing.T) {
+	testJSONMarshal(t, &UsersSearchResult{}, "{}")
+
+	u := &UsersSearchResult{
+		Total:             Int(2),
+		IncompleteResults: Bool(false),
+		Users: []*User{{
+			Login:      String("loginTest"),
+			ID:         Int64(1),
+			NodeID:     String("NodeTest"),
+			AvatarURL:  String("AvatarURLTest"),
+			HTMLURL:    String("Hurl"),
+			GravatarID: String("gravatarIDTest"),
+			Name:       String("nameTest"),
+		}},
+	}
+
+	want := `{
+		"total_count": 2,
+		"incomplete_results": false,
+		"items": [
+		   {
+			  "login": "loginTest",
+			  "id": 1,
+			  "node_id": "NodeTest",
+			  "avatar_url": "AvatarURLTest",
+			  "html_url": "Hurl",
+			  "gravatar_id": "gravatarIDTest",
+			  "name": "nameTest"
+		   }
+		]
+	 }`
+
+	testJSONMarshal(t, u, want)
+}
+
+func TestCodeSearchResult_Marshal(t *testing.T) {
+	testJSONMarshal(t, &CodeSearchResult{}, "{}")
+
+	u := &CodeSearchResult{
+		Total:             Int(4),
+		IncompleteResults: Bool(false),
+		CodeResults:       []*CodeResult{{Name: String("n")}},
+	}
+
+	want := `{
+		"total_count" : 4,
+		"incomplete_results" : false,
+		"items" : [{"name": "n"}]
 	}`
 
 	testJSONMarshal(t, u, want)

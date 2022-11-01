@@ -2098,3 +2098,163 @@ func TestTeamsService_RemoveConnectedExternalGroup_notFound(t *testing.T) {
 		t.Errorf("Teams.GetExternalGroup returned status %d, want %d", got, want)
 	}
 }
+
+func TestIDPGroupList_Marshal(t *testing.T) {
+	testJSONMarshal(t, &IDPGroupList{}, "{}")
+
+	u := &IDPGroupList{
+		Groups: []*IDPGroup{
+			{
+				GroupID:          String("abc1"),
+				GroupName:        String("test group"),
+				GroupDescription: String("test group descripation"),
+			},
+			{
+				GroupID:          String("abc2"),
+				GroupName:        String("test group2"),
+				GroupDescription: String("test group descripation2"),
+			},
+		},
+	}
+
+	want := `{
+		"groups": [
+			{
+				"group_id": "abc1",
+				"group_name": "test group",
+				"group_description": "test group descripation"
+			},
+			{
+				"group_id": "abc2",
+				"group_name": "test group2",
+				"group_description": "test group descripation2"
+			}
+		]
+	}`
+
+	testJSONMarshal(t, u, want)
+}
+
+func TestExternalGroupMember_Marshal(t *testing.T) {
+	testJSONMarshal(t, &ExternalGroupMember{}, "{}")
+
+	u := &ExternalGroupMember{
+		MemberID:    Int64(1),
+		MemberLogin: String("test member"),
+		MemberName:  String("test member name"),
+		MemberEmail: String("test member email"),
+	}
+
+	want := `{
+		"member_id": 1,
+		"member_login": "test member",
+		"member_name":"test member name",
+		"member_email":"test member email"
+	}`
+
+	testJSONMarshal(t, u, want)
+}
+
+func TestExternalGroup_Marshal(t *testing.T) {
+	testJSONMarshal(t, &ExternalGroup{}, "{}")
+
+	u := &ExternalGroup{
+		GroupID:   Int64(123),
+		GroupName: String("group1"),
+		UpdatedAt: &Timestamp{referenceTime},
+		Teams: []*ExternalGroupTeam{
+			{
+				TeamID:   Int64(1),
+				TeamName: String("team-test"),
+			},
+			{
+				TeamID:   Int64(2),
+				TeamName: String("team-test2"),
+			},
+		},
+		Members: []*ExternalGroupMember{
+			{
+				MemberID:    Int64(1),
+				MemberLogin: String("test"),
+				MemberName:  String("test"),
+				MemberEmail: String("test@github.com"),
+			},
+		},
+	}
+
+	want := `{
+		"group_id": 123,
+		"group_name": "group1",
+		"updated_at": ` + referenceTimeStr + `,
+		"teams": [
+			{
+				"team_id": 1,
+				"team_name": "team-test"
+			},
+			{
+				"team_id": 2,
+				"team_name": "team-test2"
+			}
+		],
+		"members": [
+			{
+				"member_id": 1,
+				"member_login": "test",
+				"member_name": "test",
+				"member_email": "test@github.com"
+			}
+		]
+	}`
+
+	testJSONMarshal(t, u, want)
+}
+
+func TestExternalGroupTeam_Marshal(t *testing.T) {
+	testJSONMarshal(t, &ExternalGroupTeam{}, "{}")
+
+	u := &ExternalGroupTeam{
+		TeamID:   Int64(123),
+		TeamName: String("test"),
+	}
+
+	want := `{
+		"team_id": 123,
+		"team_name": "test"
+	}`
+
+	testJSONMarshal(t, u, want)
+}
+
+func TestListExternalGroupsOptions_Marshal(t *testing.T) {
+	testJSONMarshal(t, &ListExternalGroupsOptions{}, "{}")
+
+	u := &ListExternalGroupsOptions{
+		DisplayName: String("test"),
+		ListOptions: ListOptions{
+			Page:    1,
+			PerPage: 2,
+		},
+	}
+
+	want := `{
+		"DisplayName": "test",
+		"page":	1,
+		"PerPage":	2
+	}`
+
+	testJSONMarshal(t, u, want)
+}
+
+func TestTeamAddTeamRepoOptions_Marshal(t *testing.T) {
+	testJSONMarshal(t, &TeamAddTeamRepoOptions{}, "{}")
+
+	u := &TeamAddTeamRepoOptions{
+		Permission: "a",
+	}
+
+	want := `{
+		"permission": "a"
+	}`
+
+	testJSONMarshal(t, u, want)
+}
