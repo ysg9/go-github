@@ -1216,6 +1216,16 @@ func TestAuditEntry_GetRepositoryPublic(tt *testing.T) {
 	a.GetRepositoryPublic()
 }
 
+func TestAuditEntry_GetRunAttempt(tt *testing.T) {
+	var zeroValue int64
+	a := &AuditEntry{RunAttempt: &zeroValue}
+	a.GetRunAttempt()
+	a = &AuditEntry{}
+	a.GetRunAttempt()
+	a = nil
+	a.GetRunAttempt()
+}
+
 func TestAuditEntry_GetRunnerGroupID(tt *testing.T) {
 	var zeroValue int64
 	a := &AuditEntry{RunnerGroupID: &zeroValue}
@@ -2697,6 +2707,16 @@ func TestCodeOfConduct_GetURL(tt *testing.T) {
 	c.GetURL()
 	c = nil
 	c.GetURL()
+}
+
+func TestCodeownersError_GetSuggestion(tt *testing.T) {
+	var zeroValue string
+	c := &CodeownersError{Suggestion: &zeroValue}
+	c.GetSuggestion()
+	c = &CodeownersError{}
+	c.GetSuggestion()
+	c = nil
+	c.GetSuggestion()
 }
 
 func TestCodeResult_GetHTMLURL(tt *testing.T) {
@@ -8938,6 +8958,16 @@ func TestIssueRequest_GetState(tt *testing.T) {
 	i.GetState()
 }
 
+func TestIssueRequest_GetStateReason(tt *testing.T) {
+	var zeroValue string
+	i := &IssueRequest{StateReason: &zeroValue}
+	i.GetStateReason()
+	i = &IssueRequest{}
+	i.GetStateReason()
+	i = nil
+	i.GetStateReason()
+}
+
 func TestIssueRequest_GetTitle(tt *testing.T) {
 	var zeroValue string
 	i := &IssueRequest{Title: &zeroValue}
@@ -12633,10 +12663,7 @@ func TestPagesUpdate_GetPublic(tt *testing.T) {
 }
 
 func TestPagesUpdate_GetSource(tt *testing.T) {
-	var zeroValue string
-	p := &PagesUpdate{Source: &zeroValue}
-	p.GetSource()
-	p = &PagesUpdate{}
+	p := &PagesUpdate{}
 	p.GetSource()
 	p = nil
 	p.GetSource()
